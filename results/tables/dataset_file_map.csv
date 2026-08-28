@@ -1,0 +1,6 @@
+file,role,key_column,information_provided,relationship_to_NP_dataset
+NP_dataset.csv,"FINAL analytical table (all features, numeric)",(row position; no identity column),"18 numeric features: polymer, molecular descriptors, formulation/process params, surfactant_HLB, solvent_polarity_index, particle_size, EE, LC",IS NP_dataset.csv (the target analytical file)
+NP_dataset_formulations.csv,Initial literature-curated formulations,reference + small_molecule_name + surfactant_name + solvent (identity); row-aligned 1:1 to NP_dataset.csv,"Source publication (DOI), drug name, surfactant name, solvent name + raw formulation params + particle_size, EE, LC","Same 433 rows, row-aligned 1:1; SUPPLIES drug identity & provenance missing from the final file"
+NP_dataset_small_molecules.csv,Small-molecule lookup / structure table,small_molecule_name,"canonical_SMILES, mol_melting_point (65 molecules)",Many-to-one lookup: one row per drug; SMILES used to generate RDKit descriptors present in the final file
+NP_dataset_surfactants.csv,Surfactant lookup table,surfactant_name,surfactant_HLB (9 surfactants incl. 'none' = 0),Many-to-one lookup: supplies surfactant_HLB column in the final file
+NP_dataset_solvents.csv,Solvent lookup table,solvent,solvent_polarity_index (4 solvents),Many-to-one lookup: supplies solvent_polarity_index column in the final file

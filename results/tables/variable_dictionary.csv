@@ -1,0 +1,24 @@
+variable_name,data_type,scientific_category,unit_if_known,description,candidate_predictor_yes_no_uncertain,reason
+polymer_MW,float64,PLGA/polymer descriptor,kDa (interp.),PLGA polymer molecular weight (sometimes estimated from inherent viscosity per Methods),yes,Pre-formulation polymer design variable
+LA/GA,float64,PLGA/polymer descriptor,ratio (unitless),"Lactide:glycolide ratio of PLGA (5 discrete levels: 1.0,1.86,2.33,3.0,5.67 ~ 50:50..85:15)",yes,Pre-formulation polymer design variable (effectively categorical)
+mol_MW,float64,molecular descriptor,g/mol,Molecular weight of the small molecule (RDKit from SMILES),yes,Drug molecular descriptor — transfers to unseen drugs
+mol_logP,float64,molecular descriptor,unitless (log),Calculated lipophilicity (RDKit),yes,Drug molecular descriptor; authors note logP spans a limited range
+mol_TPSA,float64,molecular descriptor,Angstrom^2,Topological polar surface area (RDKit),yes,Drug molecular descriptor
+mol_melting_point,float64,molecular descriptor,deg C,"Experimental melting point (from literature, not RDKit)",yes,"Drug property; note it is measured, not purely structural"
+mol_Hacceptors,int64,molecular descriptor,count,H-bond acceptors (RDKit),yes,Drug molecular descriptor
+mol_Hdonors,int64,molecular descriptor,count,H-bond donors (RDKit),yes,Drug molecular descriptor
+mol_heteroatoms,int64,molecular descriptor,count,Heteroatom count (RDKit),yes,Drug molecular descriptor
+drug/polymer,float64,formulation/process,w/w ratio (unitless),Initial weight ratio of small molecule to PLGA,yes,Formulation/process design variable
+surfactant_concentration,float64,formulation/process,% w/v (interp.),Surfactant concentration in the aqueous phase,yes,Formulation/process design variable
+surfactant_HLB,float64,surfactant descriptor,unitless (HLB),Hydrophilic-lipophilic balance of surfactant ('none'=0),yes,Surfactant descriptor (design-time known)
+aqueous/organic,float64,formulation/process,v/v ratio (unitless),Initial aqueous:organic phase volume ratio,yes,Formulation/process design variable
+pH,int64,formulation/process,ordinal code,"ENCODED aqueous-phase pH: codes {-2,-1,0,1}; Methods bin >8->1, 4-8->0, <4->-1 (code -2 not explained in retrieved Methods)",uncertain,"Design variable but ENCODED, not raw pH; treat as ordinal/categorical; verify -2 meaning"
+solvent_polarity_index,float64,solvent descriptor,unitless,Polarity index of the organic solvent,yes,Solvent descriptor (design-time known)
+particle_size,float64,performance outcome,nm,Measured nanoparticle diameter,no,"MEASURED outcome, not a pre-formulation design variable — excluded from main predictors"
+EE,float64,performance outcome,%,Encapsulation efficiency — PRIMARY TARGET,no,This is the prediction target
+LC,float64,performance outcome,%,Loading capacity — measured/derived outcome,no,LEAKAGE: can be inter-converted with EE via formulation quantities
+small_molecule_name,str,identifier,-,Drug name (identity),no,"Identifier -> GROUP variable only, never a feature"
+drug_key,str,identifier,-,Normalised drug name (derived here for grouping),no,Grouping key only
+reference,str,publication/provenance,-,Source publication DOI,no,"Provenance -> study-level grouping only, never a feature"
+surfactant_name,str,identifier,-,Surfactant identity (maps to surfactant_HLB),no,Identifier; use HLB as the numeric feature instead
+solvent,str,identifier,-,Solvent identity (maps to solvent_polarity_index),no,Identifier; use polarity index as the numeric feature instead

@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl --version)",
+      "Bash(curl -sSL --max-time 45 -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\)\" \"https://data.mendeley.com/public-api/datasets/sbjf5csrdm/files?folder_id=root&version=1\")",
+      "Bash(exit 1)",
+      "Bash(./.venv/Scripts/python.exe -c \"import pandas,numpy,matplotlib,scipy,nbformat,nbconvert,ipykernel; print\\('pandas',pandas.__version__,'| numpy',numpy.__version__,'| matplotlib',matplotlib.__version__,'| scipy',scipy.__version__,'| nbconvert',nbconvert.__version__\\)\")",
+      "Bash(mkdir -p results/audit results/tables results/figures data/processed)",
+      "Bash(./.venv/Scripts/python.exe -m ipykernel install --user --name plga-venv --display-name \"Python 3 \\(PLGA-venv\\)\")",
+      "Bash(./.venv/Scripts/python.exe -m jupyter kernelspec list)",
+      "Bash(./.venv/Scripts/python.exe \"C:/Users/ALISHE~1/AppData/Local/Temp/plga_recon.py\")",
+      "Bash(./.venv/Scripts/python.exe \"C:/Users/ALISHE~1/AppData/Local/Temp/plga_make_nb.py\")",
+      "Bash(./.venv/Scripts/python.exe -m nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=plga-venv --ExecutePreprocessor.timeout=600 notebooks/01_data_audit.ipynb)",
+      "Bash(./.venv/Scripts/python.exe -c ' *)",
+      "Bash(./.venv/Scripts/python.exe -c \"import pandas as pd; d=pd.read_csv\\('results/audit/source_manifest.csv'\\); print\\(d[['filename','file_size_bytes','integrity_verified']].to_string\\(index=False\\)\\)\")",
+      "Bash(./.venv/Scripts/python.exe -m pip install --quiet scikit-learn joblib)",
+      "Bash(./.venv/Scripts/python.exe -c \"import sklearn, joblib; print\\('scikit-learn', sklearn.__version__\\); print\\('joblib', joblib.__version__\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 ./.venv/Scripts/python.exe -c ' *)",
+      "Bash(./.venv/Scripts/python.exe \"C:/Users/ALISHE~1/AppData/Local/Temp/plga_make_nb.py\" \"C:/Users/ALISHE~1/AppData/Local/Temp/plga_cells_03.txt\" \"notebooks/03_exploratory_analysis.ipynb\")",
+      "Bash(PYTHONIOENCODING=utf-8 ./.venv/Scripts/python.exe -m nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=plga-venv --ExecutePreprocessor.timeout=900 notebooks/03_exploratory_analysis.ipynb)",
+      "Bash(./.venv/Scripts/python.exe -m pip install xgboost)",
+      "Bash(./.venv/Scripts/python.exe -c \"import xgboost; print\\('xgboost', xgboost.__version__\\)\")",
+      "Bash(./.venv/Scripts/python.exe \"C:/Users/ALISHE~1/AppData/Local/Temp/plga_make_nb.py\" \"C:/Users/ALISHE~1/AppData/Local/Temp/plga_cells_04.txt\" \"notebooks/04_model_training.ipynb\")",
+      "Bash(PYTHONIOENCODING=utf-8 ./.venv/Scripts/python.exe -m nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=plga-venv --ExecutePreprocessor.timeout=1800 notebooks/04_model_training.ipynb)",
+      "Bash(PYTHONIOENCODING=utf-8 ./.venv/Scripts/python.exe -m nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=plga-venv --ExecutePreprocessor.timeout=2400 notebooks/04_model_training.ipynb)",
+      "Bash(PYTHONIOENCODING=utf-8 \"C:/Users/Ali sheroz/Desktop/PLGA-EE-Generalization/.venv/Scripts/python.exe\" plga_make_nb.py plga_cells_05.txt \"C:/Users/Ali sheroz/Desktop/PLGA-EE-Generalization/notebooks/05_explainability_and_errors.ipynb\")",
+      "Bash(PYTHONIOENCODING=utf-8 ./.venv/Scripts/python.exe -m jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=1800 --ExecutePreprocessor.kernel_name=plga-venv notebooks/05_explainability_and_errors.ipynb)"
+    ]
+  }
+}

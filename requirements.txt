@@ -1,0 +1,26 @@
+# PLGA-EE-Generalization dependencies. Python 3.12.
+# Versions below are those used and verified for the Phase 1 audit and Phase 2/3 preprocessing+EDA.
+
+pandas==3.0.5
+numpy==2.5.2
+matplotlib==3.11.1
+scipy==1.18.1
+
+# Preprocessing (Phase 2): StandardScaler, one-hot encoding, fitted pipeline persistence
+scikit-learn==1.9.0
+joblib==1.5.3
+
+# Modelling (Phase 4): gradient-boosted trees
+xgboost==3.4.1
+
+# Explainability (Phase 5): TreeExplainer over the fitted Random Forest
+shap==0.52.0
+
+# Notebook build & execution
+nbformat==7.17.1
+nbconvert==7.17.1
+ipykernel==7.1.0
+jupyter-client==8.6.3
+
+# NOTE: molecular featurisation from SMILES (RDKit) is NOT yet listed — the dataset already
+# ships RDKit descriptors, so RDKit is only needed to featurise NEW molecules (later phase).

@@ -1,0 +1,6 @@
+filename,source,dataset_DOI,download_date,file_size_bytes,SHA256,license,modified_no,integrity_verified
+NP_dataset.csv,"Mendeley Data (official record, public API)",10.17632/sbjf5csrdm.1,2026-08-27,31170,51cca74b0ed5f24d02dc5ba9f416fc2e1769f56193fe4bd84f1d4f48a818d3b8,CC BY 4.0,no,PASS
+NP_dataset_formulations.csv,"Mendeley Data (official record, public API)",10.17632/sbjf5csrdm.1,2026-08-27,40261,1cf666cc5dbc249503a632236691884a7d599606faa6d32d938db45163484357,CC BY 4.0,no,PASS
+NP_dataset_small_molecules.csv,"Mendeley Data (official record, public API)",10.17632/sbjf5csrdm.1,2026-08-27,4696,c49898e48de033b47d21fceb4110aca2325f241a602402c2bc6ad0001f3be3fa,CC BY 4.0,no,PASS
+NP_dataset_solvents.csv,"Mendeley Data (official record, public API)",10.17632/sbjf5csrdm.1,2026-08-27,93,39fd8ddb553912ed6a69b0ae1e1ed46ea7d0d9463489eb4f6bc00fe0f307e279,CC BY 4.0,no,PASS
+NP_dataset_surfactants.csv,"Mendeley Data (official record, public API)",10.17632/sbjf5csrdm.1,2026-08-27,168,9027eb013e3922f96e64ef7b1478f02b831dbec3ab30d3f2c3651555f96e7a27,CC BY 4.0,no,PASS

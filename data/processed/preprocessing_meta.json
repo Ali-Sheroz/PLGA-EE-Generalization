@@ -1,0 +1,43 @@
+{
+  "target": "EE",
+  "leakage_dropped": [
+    "LC",
+    "particle_size"
+  ],
+  "continuous_features": [
+    "mol_MW",
+    "mol_logP",
+    "mol_TPSA",
+    "mol_melting_point",
+    "mol_Hacceptors",
+    "mol_Hdonors",
+    "mol_heteroatoms",
+    "polymer_MW",
+    "drug/polymer",
+    "surfactant_concentration",
+    "aqueous/organic",
+    "surfactant_HLB",
+    "solvent_polarity_index"
+  ],
+  "categorical_features": [
+    "pH",
+    "LA/GA"
+  ],
+  "onehot_output_columns": [
+    "pH_-1",
+    "pH_0",
+    "pH_1",
+    "pH_missing",
+    "LAGA_1",
+    "LAGA_1.86",
+    "LAGA_2.33",
+    "LAGA_3",
+    "LAGA_5.67"
+  ],
+  "group_key_for_cv": "drug_group",
+  "n_rows": 430,
+  "n_drugs": 65,
+  "n_drug_groups": 63,
+  "sklearn_version": "1.9.0",
+  "scaling_note": "Scaler fit on FULL dataset for this file; re-fit within CV train folds for Phase 4."
+}

@@ -1,0 +1,17 @@
+statistic,value
+n_nonmissing,433.0
+n_missing,0.0
+pct_available,100.0
+min,0.0
+max,98.9
+mean,64.651
+median,70.62
+std,23.597
+p5,8.796000000000001
+p25,52.3
+p75,83.24
+p95,91.496
+n_below_0,0.0
+n_above_100,0.0
+n_exactly_0,1.0
+n_exactly_100,0.0

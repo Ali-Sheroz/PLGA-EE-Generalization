@@ -1,0 +1,24 @@
+variable,risk_level,reason,recommended_action
+EE,TARGET,"This is the prediction target (encapsulation efficiency, %).",Use as y; never as a feature.
+LC,DEFINITE_LEAKAGE,Paper Methods: EE and LC were inter-calculated from each other using formulation quantities (drug/polymer). A model given LC can reconstruct EE.,EXCLUDE from predictors.
+particle_size,HIGH,"Experimentally MEASURED nanoparticle outcome of the same synthesis, not a pre-formulation design variable; not known before making the particle.",Exclude from main model; optional labelled sensitivity analysis only.
+small_molecule_name,HIGH,Drug identity. Using it as a feature = memorising drug labels; also destroys the 'unseen drug' premise if leaked into training.,Use ONLY as the grouping variable for CV.
+drug_key,HIGH,Derived drug identity (same as above).,Grouping only.
+reference,MODERATE,Source-publication id. As a feature it encodes study identity (batch effect) and cannot generalise to new studies.,Use only for study-level grouping/analysis; never a feature.
+surfactant_name,LOW,Categorical identity; its scientific content is captured numerically by surfactant_HLB.,"Prefer surfactant_HLB; if encoded, ensure no test-set leakage."
+solvent,LOW,Categorical identity; captured numerically by solvent_polarity_index.,Prefer solvent_polarity_index.
+mol_MW,LOW,Pre-formulation molecular descriptor known before synthesis.,Eligible predictor.
+mol_logP,LOW,Pre-formulation molecular descriptor.,Eligible predictor (watch limited range).
+mol_TPSA,LOW,Pre-formulation molecular descriptor.,Eligible predictor.
+mol_melting_point,LOW,"Drug property (measured, but a fixed property of the molecule, known pre-formulation).",Eligible predictor.
+mol_Hacceptors,LOW,Pre-formulation molecular descriptor.,Eligible predictor.
+mol_Hdonors,LOW,Pre-formulation molecular descriptor.,Eligible predictor.
+mol_heteroatoms,LOW,Pre-formulation molecular descriptor.,Eligible predictor.
+polymer_MW,LOW,Pre-formulation polymer design variable.,Eligible predictor.
+LA/GA,LOW,Pre-formulation polymer design variable.,Eligible predictor.
+drug/polymer,LOW,Pre-formulation process design variable.,Eligible predictor.
+surfactant_concentration,LOW,Pre-formulation process design variable.,Eligible predictor.
+surfactant_HLB,LOW,Surfactant descriptor known at design time.,Eligible predictor.
+aqueous/organic,LOW,Pre-formulation process design variable.,Eligible predictor.
+solvent_polarity_index,LOW,Solvent descriptor known at design time.,Eligible predictor.
+pH,MODERATE,Design variable but ENCODED (ordinal codes); '-2' undefined in retrieved Methods; treat carefully.,Eligible as ordinal/categorical after clarifying encoding.

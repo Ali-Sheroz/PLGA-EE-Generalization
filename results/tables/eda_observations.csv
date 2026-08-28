@@ -1,0 +1,8 @@
+observation,finding,implication
+target_distribution,"EE median 70.6% (IQR 52.4-83.2), skew -1.00, Shapiro p=1.6e-15",Left-skewed and bounded: report median/IQR and MAE alongside mean/SD and RMSE.
+low_EE_tail,"32 formulations below EE 20%, of which 1 is a retained total failure",Sparse tail; errors will concentrate here. Do not delete it - it is a real outcome.
+strongest_linear_associations,surfactant_concentration r=+0.31 (p=4e-11); surfactant_HLB r=+0.30 (p=2e-10); mol_logP r=+0.23 (p=2e-06),"All |r| are modest - no single descriptor determines EE. Multivariate, non-linear models are justified."
+logP_vs_EE,pooled Pearson r=+0.227 (p=1.94e-06) across 430 formulations,"Weak pooled trend, confounded by study and polymer grade. Not a mechanistic lipophilicity claim."
+laga_coverage,LA/GA 1: n=349; LA/GA 1.86: n=3; LA/GA 2.33: n=1; LA/GA 3: n=76; LA/GA 5.67: n=1,Copolymer grades are unevenly sampled; grade-specific trends rest on unequal support.
+non_independence,430 formulations from 63 drug groups and 59 studies,Correlation p-values assume independence and are therefore optimistic. Use grouped CV in Phase 4.
+pH_missing_category,pH_missing (undocumented -2 code) applies to 26 formulations,"Encoded as an explicit category, never imputed."

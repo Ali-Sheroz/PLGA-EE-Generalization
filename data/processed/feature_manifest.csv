@@ -1,0 +1,32 @@
+column,role,note
+row_id,metadata_or_group,NOT a predictor; drug_group is the GroupKFold key
+small_molecule_name,metadata_or_group,NOT a predictor; drug_group is the GroupKFold key
+drug_key,metadata_or_group,NOT a predictor; drug_group is the GroupKFold key
+drug_group,metadata_or_group,NOT a predictor; drug_group is the GroupKFold key
+reference,metadata_or_group,NOT a predictor; drug_group is the GroupKFold key
+surfactant_name,metadata_or_group,NOT a predictor; drug_group is the GroupKFold key
+solvent,metadata_or_group,NOT a predictor; drug_group is the GroupKFold key
+EE_is_zero,metadata_or_group,NOT a predictor; drug_group is the GroupKFold key
+EE,target,continuous EE% (unscaled)
+mol_MW,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+mol_logP,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+mol_TPSA,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+mol_melting_point,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+mol_Hacceptors,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+mol_Hdonors,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+mol_heteroatoms,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+polymer_MW,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+drug/polymer,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+surfactant_concentration,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+aqueous/organic,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+surfactant_HLB,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+solvent_polarity_index,feature_continuous_scaled,StandardScaler applied (global fit — see caveat)
+pH_-1,feature_categorical_onehot,one-hot; pH_missing = undocumented -2 code
+pH_0,feature_categorical_onehot,one-hot; pH_missing = undocumented -2 code
+pH_1,feature_categorical_onehot,one-hot; pH_missing = undocumented -2 code
+pH_missing,feature_categorical_onehot,one-hot; pH_missing = undocumented -2 code
+LAGA_1,feature_categorical_onehot,one-hot; pH_missing = undocumented -2 code
+LAGA_1.86,feature_categorical_onehot,one-hot; pH_missing = undocumented -2 code
+LAGA_2.33,feature_categorical_onehot,one-hot; pH_missing = undocumented -2 code
+LAGA_3,feature_categorical_onehot,one-hot; pH_missing = undocumented -2 code
+LAGA_5.67,feature_categorical_onehot,one-hot; pH_missing = undocumented -2 code

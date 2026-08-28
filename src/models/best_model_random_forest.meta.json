@@ -1,0 +1,94 @@
+{
+  "artifact": "best_model_random_forest.joblib",
+  "selected_model": "Random Forest",
+  "selection_criterion": "lowest mean MAE across GroupKFold(n_splits=5) on drug_group",
+  "fitted_on": "all 430 formulations (final refit after model selection)",
+  "target": "EE",
+  "target_units": "EE %  (unscaled)",
+  "feature_order": [
+    "mol_MW",
+    "mol_logP",
+    "mol_TPSA",
+    "mol_melting_point",
+    "mol_Hacceptors",
+    "mol_Hdonors",
+    "mol_heteroatoms",
+    "polymer_MW",
+    "drug/polymer",
+    "surfactant_concentration",
+    "aqueous/organic",
+    "surfactant_HLB",
+    "solvent_polarity_index",
+    "pH_-1",
+    "pH_0",
+    "pH_1",
+    "pH_missing",
+    "LAGA_1",
+    "LAGA_3",
+    "LAGA_other"
+  ],
+  "continuous_features": [
+    "mol_MW",
+    "mol_logP",
+    "mol_TPSA",
+    "mol_melting_point",
+    "mol_Hacceptors",
+    "mol_Hdonors",
+    "mol_heteroatoms",
+    "polymer_MW",
+    "drug/polymer",
+    "surfactant_concentration",
+    "aqueous/organic",
+    "surfactant_HLB",
+    "solvent_polarity_index"
+  ],
+  "onehot_features": [
+    "pH_-1",
+    "pH_0",
+    "pH_1",
+    "pH_missing",
+    "LAGA_1",
+    "LAGA_3",
+    "LAGA_other"
+  ],
+  "laga_grades_merged_into_other": [
+    1.86,
+    2.33,
+    5.67
+  ],
+  "leakage_excluded": [
+    "LC",
+    "particle_size"
+  ],
+  "cv": {
+    "strategy": "GroupKFold(n_splits=5)",
+    "group_key": "drug_group",
+    "n_drug_groups": 63
+  },
+  "cv_scores": {
+    "R2_mean": -0.07582988127651795,
+    "R2_std": 0.5021314361385767,
+    "MAE_mean": 16.695376859995303,
+    "MAE_std": 2.721485341386696,
+    "RMSE_mean": 21.26152881531548,
+    "RMSE_std": 2.687338548001037,
+    "OOF_R2": 0.16968555787222162,
+    "OOF_MAE": 16.695376859995303,
+    "OOF_RMSE": 21.396963297200568
+  },
+  "hyperparameters": "library defaults (no search performed); random_state=42",
+  "generalisation_caveat": "Selected on the single deterministic GroupKFold partition. Across 5 SHUFFLED grouped partitions the pooled out-of-fold MAE of every model was WORSE on average than a training-mean DummyRegressor. Do NOT present this artefact as a validated predictor of EE% for unseen drugs. See results/tables/ML_grouped_performance_pooled_oof_repeated.csv.",
+  "pooled_oof_repeated": {
+    "mean_predictor_OOF_MAE": 19.138030245548897,
+    "best_model_OOF_MAE": 20.71015979045928,
+    "best_model_name": "Random Forest",
+    "any_model_beats_mean_predictor_on_average": false
+  },
+  "versions": {
+    "python": "3.12.10",
+    "scikit-learn": "1.9.0",
+    "xgboost": "3.4.1",
+    "pandas": "3.0.5",
+    "numpy": "2.5.2"
+  }
+}

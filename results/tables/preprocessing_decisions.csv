@@ -1,0 +1,8 @@
+flag_or_step,action,n_affected,rationale
+duplicates,dropped 3 exact-duplicate rows (keep first),3,Phase-1 flag; identical across all 18 features + identity
+pH_anomaly,pH code -2 -> NaN; encoded as explicit 'missing' one-hot,26,undocumented code; not imputed
+EE_zero,retained + flagged (EE_is_zero),1,total encapsulation failure is a valid outcome
+salt_hydrate_grouping,added drug_group for CV grouping; descriptors retained,5,prevents same-parent leakage across folds
+leakage_drop,"hard-dropped ['LC', 'particle_size'] from predictors",2,LC inter-convertible w/ EE; particle_size is a measured outcome
+scaling,StandardScaler on 13 continuous features (global fit),13,CAVEAT: re-fit within CV train folds in Phase 4
+encoding,one-hot pH + LA/GA,9,"categorical/ordinal codes, not measurements"
