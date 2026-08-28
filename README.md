@@ -26,7 +26,6 @@ Goren A, Bao Z, Martinez Lozano JP, Allen C. *A formulation dataset of poly(lact
 Full dataset provenance and SHA256 integrity records are provided in [`data/README.md`](https://github.com/Ali-Sheroz/PLGA-EE-Generalization/blob/main/data/README.md). The original raw files were retained unchanged throughout the analysis.
 
 ## Project status
-- ## Project Status
 
 - **Phase 1 — Data feasibility audit: complete.** No modeling was performed. Final assessment: **FEASIBLE WITH MODIFICATIONS**.
 - **Phase 2 — Data preprocessing: complete.** All five issues identified during the feasibility audit were resolved, producing `data/processed/ML_ready_PLGA.csv` (430 × 31).
@@ -75,29 +74,28 @@ results/
   audit/            # source manifest and feasibility report
 
 src/
-  preprocessing.py  # reusable preprocessing utilities
+  preprocessing.py   # reusable preprocessing utilities
+  validation.py      # drug-grouped validation and leakage checks
+  model_training.py  # regression model definitions
+  explainability.py  # SHAP/model-attribution utilities
 
-  validation.py     # drug-grouped validation and leakage checks
-
-  model_training.py # regression model definitions
-
-  explainability.py # SHAP/model-attribution utilities
-
-  models/           # saved model artifact and metadata
+  models/            # saved model artifact and metadata
 ```
 
 ## Phase 1 deliverables
-- **Feasibility report:** [`results/audit/feasibility_report.md`](results/audit/feasibility_report.md) — answers questions A–L + overall classification.
-- **Integrity manifest:** [`results/audit/source_manifest.csv`](results/audit/source_manifest.csv).
-- **Audit tables** in `results/tables/`: dataset file map, variable dictionary, missingness summary, formulations-per-drug, EE summary, leakage audit, duplicate audit, outlier flags.
-- **Figures** in `results/figures/`: EE distribution & boxplot, formulations-per-drug, missingness, molecular-descriptor & formulation-variable distributions, correlation matrix, EE-vs-variables scatters, EE-by-drug boxplot.
 
-## Key findings (Phase 1)
-- 433 formulations, 65 small molecules, 59 source publications — all verified directly from the files (match the paper's headline counts).
-- **EE is 100 % complete** and within 0–100 %; suitable as the regression target.
-- **Severe drug imbalance:** median = 1 formulation/drug; **33 of 65 drugs (~51 %) are singletons**; the top 10 drugs supply ~66 % of formulations. ⇒ evaluation **must** use drug-grouped cross-validation, not random splits.
-- **Leakage rules:** exclude **`LC`** (definite leakage — inter-convertible with EE) and **`particle_size`** (measured outcome) from EE predictors.
-- **`pH` is an ordinal code**, not raw pH; an undocumented `-2` code is flagged for clarification.
+- **Feasibility report:** [`results/audit/feasibility_report.md`](https://github.com/Ali-Sheroz/PLGA-EE-Generalization/blob/main/results/audit/feasibility_report.md) — summarizes the feasibility assessment and overall classification.
+- **Integrity manifest:** [`results/audit/source_manifest.csv`](https://github.com/Ali-Sheroz/PLGA-EE-Generalization/blob/main/results/audit/source_manifest.csv) — records source provenance and file-integrity information.
+- **Audit tables:** available in `results/tables/`, including the dataset file map, variable dictionary, missingness summary, formulations-per-drug table, EE summary, leakage audit, duplicate audit, and outlier flags.
+- **Figures:** available in `results/figures/`, including EE distribution and boxplots, formulations-per-drug, missingness, molecular and formulation-variable distributions, the correlation matrix, EE-versus-variable plots, and EE-by-drug distributions.
+
+## Key Findings — Phase 1
+
+- The source files contained **433 formulations, 65 small molecules, and 59 source publications**, consistent with the reported dataset characteristics.
+- **Encapsulation efficiency was complete for all formulations** and ranged from 0–100%, supporting its use as the regression target.
+- **Drug representation was highly imbalanced:** the median was one formulation per drug, **33 of 65 drugs (~51%) were represented by a single formulation**, and the 10 most represented drugs accounted for approximately 66% of all formulations. This distribution supported the use of **drug-grouped validation** rather than random formulation-level splitting for the unseen-drug analysis.
+- **`LC` was excluded from EE prediction because of target-leakage risk**, while **`particle_size` was excluded because it is a measured formulation outcome rather than a pre-formulation predictor**.
+- **`pH` was represented as an ordinal code rather than raw pH values.** An undocumented `-2` category was identified during the audit and addressed during preprocessing.
 
 ## Phase 2 deliverables (preprocessing)
 Notebook: [`notebooks/02_preprocessing.ipynb`](notebooks/02_preprocessing.ipynb) → `data/processed/ML_ready_PLGA.csv` (**430 formulations × 31 columns**).
