@@ -98,29 +98,39 @@ src/
 - **`pH` was represented as an ordinal code rather than raw pH values.** An undocumented `-2` category was identified during the audit and addressed during preprocessing.
 
 ## Phase 2 deliverables (preprocessing)
-Notebook: [`notebooks/02_preprocessing.ipynb`](notebooks/02_preprocessing.ipynb) → `data/processed/ML_ready_PLGA.csv` (**430 formulations × 31 columns**).
 
-| Phase-1 flag | Resolution | Affected |
-|---|---|---|
-| Exact duplicates | dropped (keep first) → 433 → **430** rows | 3 rows |
-| Salt/hydrate variants | `drug_group` key collapses variants **for GroupKFold only**; distinct descriptors retained | 65 drugs → **63 groups** |
-| `EE = 0` | **retained** (valid total-failure outcome) + flagged `EE_is_zero` | 1 row |
-| Undocumented `pH = -2` | → `NaN`, encoded as an explicit `pH_missing` category (**never imputed**) | 26 rows |
-| Leakage | `LC` and `particle_size` **hard-dropped**; `EE` is the sole target `y` | 2 columns |
+**Notebook:** [`notebooks/02_preprocessing.ipynb`](notebooks/02_preprocessing.ipynb)  
+**Processed dataset:** `data/processed/ML_ready_PLGA.csv` (**430 formulations × 31 columns**)
 
-**Predictors:** 13 continuous (StandardScaler) + 9 one-hot (`pH` × 4, `LA/GA` × 5) = **22 features**. Target `EE` is left unscaled. Zero NaN in the output.
+| Phase 1 flag | Resolution | Affected |
+|---|---|---:|
+| Exact duplicates | Removed while retaining the first occurrence | 433 → 430 rows |
+| Salt/hydrate variants | A `drug_group` key was created for grouped validation while distinct molecular descriptors were retained | 65 drugs → 63 groups |
+| `EE = 0` | Retained as a valid zero-encapsulation outcome and flagged as `EE_is_zero` | 1 row |
+| Undocumented `pH = -2` | Converted to missing and represented as an explicit `pH_missing` category; no imputation was applied | 26 rows |
+| Leakage-prone variables | `LC` and `particle_size` were excluded from the predictor set; `EE` remained the sole target | 2 columns |
 
-> ⚠️ **Scaling caveat.** The scaler in `ML_ready_PLGA.csv` was fit on the *full* dataset to produce one finalized file. For the unseen-drug CV in Phase 4 this is mild preprocessing leakage — the scaler must be **re-fit inside each training fold**. `PLGA_clean_unscaled.csv` and `preprocessing_pipeline.joblib` are provided so Phase 4 can wrap `StandardScaler` + `OneHotEncoder` + `SVR` in a single `Pipeline` inside `GroupKFold(groups=drug_group)`.
+The processed dataset contains **13 continuous predictors** and **9 one-hot encoded categorical features**, giving **22 model features**. Continuous variables were standardized, while the target `EE` was left unscaled. No missing values remained in the processed modeling view.
 
-## Phase 3 deliverables (EDA)
-Notebook: [`notebooks/03_exploratory_analysis.ipynb`](notebooks/03_exploratory_analysis.ipynb). Figures at **300 DPI** in `results/figures/`:
-- `Fig1_correlation_heatmap_EE.png` — Pearson matrix over 13 continuous descriptors + `LA/GA` + `EE`, plus a sorted descriptor–EE panel with Spearman ρ overlaid.
-- `Fig2_logP_vs_EE_by_LAGA.png` — `mol_logP` vs EE %, colour-coded by PLGA LA/GA ratio.
-- `Fig3_EE_distribution.png` — histogram + KDE, ECDF, and box/strip views of EE %.
+> **Preprocessing note:** `ML_ready_PLGA.csv` was created as a finalized processed dataset using scaling fitted on the full dataset and is intended for inspection and reuse. It was **not used as the input for unseen-drug cross-validation**. Phase 4 instead used `PLGA_clean_unscaled.csv`, with scaling and encoding re-fitted inside each training fold to prevent preprocessing leakage.
 
-Tables: `eda_EE_summary.csv`, `eda_correlations_with_EE.csv`, `eda_correlation_matrix_pearson.csv`, `eda_observations.csv`.
+## Phase 3 Deliverables — Exploratory Data Analysis
 
-**EDA observations (descriptive only):** EE % is bounded and **left-skewed** (median 70.6 %, IQR 52.4–83.2, skew −1.00, Shapiro p ≈ 1.6e-15), with a sparse low-EE tail (32 formulations < 20 %). **No single descriptor determines EE** — the strongest associations are `surfactant_concentration` (r = +0.31), `surfactant_HLB` (r = +0.30), and `mol_logP` (r = +0.23), which is what justifies a multivariate non-linear model rather than a simple regression on lipophilicity. Reported p-values assume independent observations, which these are **not** (repeated formulations per drug and per study), so they are optimistic — hence grouped CV in Phase 4.
+**Notebook:** [`notebooks/03_exploratory_analysis.ipynb`](notebooks/03_exploratory_analysis.ipynb)
+
+Figures are available at **300 DPI** in `results/figures/`:
+
+- `Fig1_correlation_heatmap_EE.png` — Pearson correlation matrix across 13 continuous descriptors, `LA/GA`, and `EE`, accompanied by a ranked descriptor–EE panel with Spearman ρ.
+- `Fig2_logP_vs_EE_by_LAGA.png` — relationship between `mol_logP` and EE%, stratified by PLGA LA/GA ratio.
+- `Fig3_EE_distribution.png` — distribution of EE% shown using histogram, KDE, ECDF, and box/strip representations.
+
+Supporting tables include `eda_EE_summary.csv`, `eda_correlations_with_EE.csv`, `eda_correlation_matrix_pearson.csv`, and `eda_observations.csv`.
+
+### EDA Observations
+
+EE% showed a **left-skewed distribution** with a median of **70.6%**, an IQR of **52.4–83.2%**, and a skewness of **−1.00**. Thirty-two formulations had EE below 20%. No individual descriptor showed a strong association with EE. The largest observed Pearson correlations were for `surfactant_concentration` (r = +0.31), `surfactant_HLB` (r = +0.30), and `mol_logP` (r = +0.23), supporting evaluation of multivariable predictive models rather than reliance on a single formulation descriptor.
+
+These analyses are descriptive. Correlation does not imply causation, and the reported p-values assume independent observations. Because formulations are clustered within drugs and source studies, inferential statistics from the exploratory analysis should be interpreted cautiously. Drug-grouped validation was therefore used in Phase 4 to evaluate predictive generalization to unseen drugs.
 
 ## Phase 4 deliverables (model training & unseen-drug validation)
 Notebook: [`notebooks/04_model_training.ipynb`](notebooks/04_model_training.ipynb). Input is **`PLGA_clean_unscaled.csv`** (not the globally-scaled file), so `StandardScaler` sits as step 1 of every `sklearn.pipeline.Pipeline` and is re-fit inside each training fold.
