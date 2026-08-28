@@ -33,7 +33,7 @@ Full dataset provenance and SHA256 integrity records are provided in [`data/READ
 - **Phase 3 — Exploratory data analysis: complete.** Descriptive analysis produced three 300-DPI figures and supporting tables. No predictive model was trained at this stage.
 - **Phase 4 — Model training and unseen-drug validation: complete.** Four regression pipelines and a mean-prediction reference were evaluated using `GroupKFold(5)` with `drug_group` as the grouping variable. **Primary finding:** no candidate model consistently outperformed the mean-prediction reference for unseen drugs.
 - **Phase 5 — Explainability and error analysis: complete.** SHAP analysis of the fitted Random Forest and per-drug out-of-fold error analysis were used to examine model behavior and patterns of generalization failure. Predictions showed substantial shrinkage toward the dataset mean, with a regression slope of predicted versus measured EE of **0.156**.
--
+
 - ## Repository layout
 ```
 data/
