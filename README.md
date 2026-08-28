@@ -1,6 +1,5 @@
 # PLGA-EE-Generalization
 
-# PLGA-EE-Generalization
 
 **Evaluating Encapsulation-Efficiency Prediction for *Unseen* Small-Molecule Drugs in PLGA Nanoparticle Drug-Delivery Systems Using Machine Learning**
 
@@ -8,7 +7,7 @@ This undergraduate biotechnology research project evaluates whether encapsulatio
 
 > **Research question:** How accurately can machine-learning models predict encapsulation efficiency (EE%) in PLGA nanoparticle formulations for small-molecule drugs excluded from model training?
 
-The scientific focus is **unseen-drug generalization **rather than simply determining whether machine-learning models can predict encapsulation efficiency. The sole prediction target is **EE%**. Particle size, loading capacity, drug release, toxicity, efficacy, biodistribution, and clinical response are outside the scope of this study as prediction targets.
+The scientific focus is **unseen-drug generalization**rather than simply determining whether machine-learning models can predict encapsulation efficiency. The sole prediction target is **EE%**. Particle size, loading capacity, drug release, toxicity, efficacy, biodistribution, and clinical response are outside the scope of this study as prediction targets.
 
 ## Technical Stack
 
