@@ -1,12 +1,24 @@
 # PLGA-EE-Generalization
 
+# PLGA-EE-Generalization
+
 **Evaluating Encapsulation-Efficiency Prediction for *Unseen* Small-Molecule Drugs in PLGA Nanoparticle Drug-Delivery Systems Using Machine Learning**
 
-An undergraduate biotechnology research project investigating a single, focused question:
+This undergraduate biotechnology research project evaluates whether encapsulation efficiency in PLGA nanoparticle formulations can be predicted reliably for small-molecule drugs excluded from model training.
 
-> **How accurately can machine learning predict encapsulation efficiency (EE %) of PLGA nanoparticle formulations for small-molecule drugs that were completely excluded from training?**
+> **Research question:** How accurately can machine learning predict encapsulation efficiency (EE%) in PLGA nanoparticle formulations for small-molecule drugs that were completely excluded from model training?
 
-The scientific novelty is the **unseen-drug generalization** test — not merely "can ML predict EE." The **only** prediction target is **EE %**. Particle size, loading capacity, drug release, toxicity, efficacy, biodistribution, and clinical response are explicitly **out of scope** as targets.
+The scientific focus is **unseen-drug generalization** rather than simply determining whether machine learning can predict encapsulation efficiency. The sole prediction target is **EE%**. Particle size, loading capacity, drug release, toxicity, efficacy, biodistribution, and clinical response are outside the scope of this study as prediction targets.
+
+## Technical Stack
+
+- **Programming language:** Python
+- **Analysis environment:** Jupyter Notebook
+- **Data processing:** pandas, NumPy
+- **Machine learning:** scikit-learn, XGBoost
+- **Model interpretation:** SHAP
+- **Visualization:** Matplotlib
+- **Validation strategy:** drug-grouped cross-validation
 
 ## Dataset
 Goren A, Bao Z, Martinez Lozano JP, Allen C. *A formulation dataset of poly(lactide-co-glycolide) nanoparticles for small molecule delivery.* Scientific Data 2025;12:1182.
