@@ -20,18 +20,21 @@ The scientific focus is **unseen-drug generalization**rather than simply determi
 - **Validation strategy:** drug-grouped cross-validation
 
 ## Dataset
-Goren A, Bao Z, Martinez Lozano JP, Allen C. *A formulation dataset of poly(lactide-co-glycolide) nanoparticles for small molecule delivery.* Scientific Data 2025;12:1182.
-Article DOI `10.1038/s41597-025-05520-9` · Dataset DOI `10.17632/sbjf5csrdm.1` · License **CC BY 4.0**.
-See [`data/README.md`](data/README.md) for full provenance and SHA256 integrity records. Raw files are **immutable**.
+
+Goren A, Bao Z, Martinez Lozano JP, Allen C. *A formulation dataset of poly(lactide-co-glycolide) nanoparticles for small molecule delivery.* *Scientific Data*. 2025;12:1182. Article DOI: `10.1038/s41597-025-05520-9` · Dataset DOI: `10.17632/sbjf5csrdm.1` · License: **CC BY 4.0**.
+
+Full dataset provenance and SHA256 integrity records are provided in [`data/README.md`](https://github.com/Ali-Sheroz/PLGA-EE-Generalization/blob/main/data/README.md). The original raw files were retained unchanged throughout the analysis.
 
 ## Project status
-- **Phase 1 — Data feasibility audit: complete.** No modeling. Verdict: **FEASIBLE WITH MODIFICATIONS**.
-- **Phase 2 — Data preprocessing: complete.** All five Phase-1 flags resolved; `data/processed/ML_ready_PLGA.csv` written (430 × 31).
-- **Phase 3 — Exploratory data analysis: complete.** Three 300-DPI figures + supporting tables. No model trained.
-- **Phase 4 — Model training & unseen-drug validation: complete.** Four pipelines + a mean-predictor reference under `GroupKFold(5)` on `drug_group`. **Headline result is negative:** no model reliably beats the mean-predictor on unseen drugs (see below).
-- **Phase 5 — Explainability & error analysis: complete.** SHAP over the saved Random Forest + per-drug out-of-fold error attribution. Diagnoses *why* Phase 4 is negative: the model shrinks every prediction toward the dataset mean (calibration slope **0.156**).
+- ## Project Status
 
-## Repository layout
+- **Phase 1 — Data feasibility audit: complete.** No modeling was performed. Final assessment: **FEASIBLE WITH MODIFICATIONS**.
+- **Phase 2 — Data preprocessing: complete.** All five issues identified during the feasibility audit were resolved, producing `data/processed/ML_ready_PLGA.csv` (430 × 31).
+- **Phase 3 — Exploratory data analysis: complete.** Descriptive analysis produced three 300-DPI figures and supporting tables. No predictive model was trained at this stage.
+- **Phase 4 — Model training and unseen-drug validation: complete.** Four regression pipelines and a mean-prediction reference were evaluated using `GroupKFold(5)` with `drug_group` as the grouping variable. **Primary finding:** no candidate model consistently outperformed the mean-prediction reference for unseen drugs.
+- **Phase 5 — Explainability and error analysis: complete.** SHAP analysis of the fitted Random Forest and per-drug out-of-fold error analysis were used to examine model behavior and patterns of generalization failure. Predictions showed substantial shrinkage toward the dataset mean, with a regression slope of predicted versus measured EE of **0.156**.
+-
+- ## Repository layout
 ```
 data/
   raw/          # 5 official CSVs — NEVER modified (see data/README.md)
