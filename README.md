@@ -35,26 +35,54 @@ Full dataset provenance and SHA256 integrity records are provided in [`data/READ
 - **Phase 5 — Explainability and error analysis: complete.** SHAP analysis of the fitted Random Forest and per-drug out-of-fold error analysis were used to examine model behavior and patterns of generalization failure. Predictions showed substantial shrinkage toward the dataset mean, with a regression slope of predicted versus measured EE of **0.156**.
 
 - ## Repository layout
-```
+
 data/
-  raw/          # 5 official CSVs — NEVER modified (see data/README.md)
-  processed/    # derived, documented working views (nothing imputed/synthesised)
-                #   ML_ready_PLGA.csv  <- the modelling table (scaled + one-hot)
-                #   PLGA_clean_unscaled.csv, scaler_params.csv,
-                #   preprocessing_pipeline.joblib, feature_manifest.csv,
-                #   preprocessing_meta.json, master_audit_view.csv
+  raw/              # 5 official CSV files retained unchanged
+                    # see data/README.md for provenance and integrity records
+
+  processed/        # derived and documented working datasets
+                    # ML_ready_PLGA.csv
+                    # PLGA_clean_unscaled.csv
+                    # scaler_params.csv
+                    # preprocessing_pipeline.joblib
+                    # feature_manifest.csv
+                    # preprocessing_meta.json
+                    # master_audit_view.csv
+
 notebooks/
-  01_data_audit.ipynb            # Phase 1 audit (read-only)
-  02_preprocessing.ipynb         # Phase 2 flag resolution + scaling/encoding
-  03_exploratory_analysis.ipynb  # Phase 3 EDA (descriptive only)
-  04_model_training.ipynb        # Phase 4 grouped-CV training + robustness check
-  05_explainability_and_errors.ipynb  # Phase 5 SHAP + per-drug OOF error analysis
+  01_data_audit.ipynb
+                    # Phase 1: data feasibility audit
+
+  02_preprocessing.ipynb
+                    # Phase 2: preprocessing and flag resolution
+
+  03_exploratory_analysis.ipynb
+                    # Phase 3: exploratory data analysis
+
+  04_model_training.ipynb
+                    # Phase 4: grouped validation and robustness analysis
+
+  05_explainability_and_errors.ipynb
+                    # Phase 5: SHAP and per-drug error analysis
+
 results/
-  figures/      # 9 Phase-1 figures + Fig1–Fig6 EDA/modelling figures (300 dpi)
-  tables/       # machine-readable audit/preprocessing/EDA/modelling tables (CSV)
-  audit/        # source_manifest.csv + feasibility_report.md
+  figures/          # analysis and modelling figures (300 DPI)
+
+  tables/           # machine-readable audit, preprocessing,
+                    # EDA, modelling, and error-analysis tables
+
+  audit/            # source manifest and feasibility report
+
 src/
-  models/       # best_model_random_forest.joblib + .meta.json (Phase 4)
+  preprocessing.py  # reusable preprocessing utilities
+
+  validation.py     # drug-grouped validation and leakage checks
+
+  model_training.py # regression model definitions
+
+  explainability.py # SHAP/model-attribution utilities
+
+  models/           # saved model artifact and metadata
 ```
 
 ## Phase 1 deliverables
