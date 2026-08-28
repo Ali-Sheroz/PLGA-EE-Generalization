@@ -7,7 +7,7 @@ This undergraduate biotechnology research project evaluates whether encapsulatio
 
 > **Research question:** How accurately can machine-learning models predict encapsulation efficiency (EE%) in PLGA nanoparticle formulations for small-molecule drugs excluded from model training?
 
-The scientific focus is **unseen-drug generalization**rather than simply determining whether machine-learning models can predict encapsulation efficiency. The sole prediction target is **EE%**. Particle size, loading capacity, drug release, toxicity, efficacy, biodistribution, and clinical response are outside the scope of this study as prediction targets.
+The scientific focus is **unseen-drug generalization**rather than simply determining whether machine-learning models can predict encapsulation efficiency**. The sole prediction target is **EE%**. Particle size, loading capacity, drug release, toxicity, efficacy, biodistribution, and clinical response are outside the scope of this study as prediction targets.
 
 ## Technical Stack
 
@@ -141,6 +141,7 @@ Model development used **`PLGA_clean_unscaled.csv`**, rather than the globally s
 ### Validation Setup
 
 Three sparsely represented `LA/GA` categories (1.86, 2.33, and 5.67; 5 formulations across 4 drug groups) were combined into an `other` category. The final encoded feature matrix contained **430 formulations × 20 predictors**, with `EE` as the sole target.
+The Phase 2 processed view contained 22 encoded features; regrouping the sparsely represented `LA/GA` categories before model fitting reduced the final Phase 4 design matrix to 20 predictors.
 
 Unseen-drug performance was evaluated using:
 
@@ -162,7 +163,7 @@ The following results correspond to the fixed five-fold grouped partition and ar
 | 3 | XGBoost | 20.09 ± 4.23 | 24.66 ± 4.14 | −0.492 ± 0.884 |
 | 4 | Linear Regression | 24.72 ± 6.09 | 30.04 ± 7.95 | −1.091 ± 0.987 |
 
-These fixed-partition results suggested lower MAE for Random Forest. However, the negative mean R² values and large fold-to-fold variability indicated that this ranking required additional robustness testing before any conclusion about unseen-drug generalization could be made.
+These fixed-partition results suggested lower MAE for Random Forest. However, the negative mean R² values and large fold-to-fold variability indicated that this ranking required additional robustness testing before any conclusion about unseen-drug generalization could be made. 
 
 ### Model Configuration
 
@@ -188,7 +189,8 @@ To assess the stability of the ranking, grouped cross-validation was repeated ac
 | XGBoost | 21.86 ± 4.22 | −0.438 |
 | Linear Regression | 25.72 ± 1.42 | −0.785 |
 
-Across the repeated grouped partitions, **no candidate model consistently outperformed the mean-prediction reference for unseen drugs**. The lower MAE observed for Random Forest in the initial fixed partition was therefore partition-dependent rather than evidence of stable unseen-drug generalization.
+Across repeated drug-grouped partitions, no candidate model consistently outperformed the mean-prediction reference for unseen drugs. The apparent Random Forest advantage in the initial fixed partition was therefore partition-dependent rather than evidence of stable unseen-drug generalization.
+
 ### Overall Phase 4 Finding
 
 **No candidate model consistently outperformed the mean-prediction reference across repeated grouped partitions.** Random Forest outperformed the reference in 2 of 5 partitions, XGBoost in 1 of 5, while SVR and Linear Regression did not outperform it in any partition.
@@ -314,4 +316,3 @@ No values or formulations were fabricated or synthetically generated. No oversam
 ## License
 The source dataset is distributed under CC BY 4.0 and should be attributed to Goren et al. (2025) using the citation provided above.
 No separate software license is currently granted for the project code; all rights to the code are reserved unless otherwise stated.
-
