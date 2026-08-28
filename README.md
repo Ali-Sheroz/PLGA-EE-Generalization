@@ -36,6 +36,7 @@ Full dataset provenance and SHA256 integrity records are provided in [`data/READ
 
 - ## Repository layout
 
+```text
 data/
   raw/              # 5 official CSV files retained unchanged
                     # see data/README.md for provenance and integrity records
