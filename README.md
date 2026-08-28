@@ -128,103 +128,179 @@ Supporting tables include `eda_EE_summary.csv`, `eda_correlations_with_EE.csv`, 
 
 ### EDA Observations
 
-EE% showed a **left-skewed distribution** with a median of **70.6%**, an IQR of **52.4–83.2%**, and a skewness of **−1.00**. Thirty-two formulations had EE below 20%. No individual descriptor showed a strong association with EE. The largest observed Pearson correlations were for `surfactant_concentration` (r = +0.31), `surfactant_HLB` (r = +0.30), and `mol_logP` (r = +0.23), supporting evaluation of multivariable predictive models rather than reliance on a single formulation descriptor.
+EE% showed a **left-skewed distribution** with a median of **70.6%**, an IQR of **52.4–83.2%**, and a skewness of **−1.00**. Thirty-two formulations had EE below 20%. No individual descriptor showed a strong linear association with EE. The largest observed Pearson correlations were for surfactant_concentration (r = +0.31), surfactant_HLB (r = +0.30), and mol_logP (r = +0.23), supporting the use of multivariable modeling rather than reliance on any single descriptor.
 
 These analyses are descriptive. Correlation does not imply causation, and the reported p-values assume independent observations. Because formulations are clustered within drugs and source studies, inferential statistics from the exploratory analysis should be interpreted cautiously. Drug-grouped validation was therefore used in Phase 4 to evaluate predictive generalization to unseen drugs.
 
-## Phase 4 deliverables (model training & unseen-drug validation)
-Notebook: [`notebooks/04_model_training.ipynb`](notebooks/04_model_training.ipynb). Input is **`PLGA_clean_unscaled.csv`** (not the globally-scaled file), so `StandardScaler` sits as step 1 of every `sklearn.pipeline.Pipeline` and is re-fit inside each training fold.
+## Phase 4 Deliverables — Model Training and Unseen-Drug Validation
 
-**Setup.** The three near-empty copolymer grades (`LA/GA` = 1.86, 2.33, 5.67 — 5 rows across 4 drug groups) are merged into `other`; one-hot encoding then yields fixed categories `pH ∈ {-1, 0, 1, missing}` and `LA/GA ∈ {1, 3, other}`. Design matrix **430 × 20**; target `EE`; CV = `GroupKFold(n_splits=5)` on `drug_group`. Every fold asserts that neither `drug_group` **nor** the raw `small_molecule_name` appears on both sides of the split.
+**Notebook:** [`notebooks/04_model_training.ipynb`](notebooks/04_model_training.ipynb)
 
-**Leaderboard** (`results/tables/ML_grouped_performance_metrics.csv`, ranked by mean MAE):
+Model development used **`PLGA_clean_unscaled.csv`**, rather than the globally scaled processed file. Scaling and categorical encoding were therefore re-fitted within each training fold to prevent preprocessing leakage.
+
+### Validation Setup
+
+Three sparsely represented `LA/GA` categories (1.86, 2.33, and 5.67; 5 formulations across 4 drug groups) were combined into an `other` category. The final encoded feature matrix contained **430 formulations × 20 predictors**, with `EE` as the sole target.
+
+Unseen-drug performance was evaluated using:
+
+- `GroupKFold(n_splits=5)`
+- grouping variable: `drug_group`
+- no overlap of `drug_group` between training and test folds
+- no overlap of raw `small_molecule_name` between training and test folds
+- preprocessing fitted independently within each training fold
+
+### Initial Grouped-CV Results
+
+The following results correspond to the fixed five-fold grouped partition and are ranked by mean MAE:
 
 | # | Model | MAE (mean ± SD) | RMSE (mean ± SD) | R² (mean ± SD) |
-|---|---|---|---|---|
+|---|---|---:|---:|---:|
 | 1 | Random Forest | **16.70 ± 2.72** | 21.26 ± 2.69 | −0.076 ± 0.502 |
 | 2 | SVR (RBF) | 18.33 ± 1.96 | 22.65 ± 2.31 | −0.196 ± 0.497 |
 | — | *DummyRegressor (reference)* | *19.26 ± 4.37* | *23.59 ± 5.16* | *−0.194 ± 0.296* |
 | 3 | XGBoost | 20.09 ± 4.23 | 24.66 ± 4.14 | −0.492 ± 0.884 |
-| 4 | Linear Regression (baseline) | 24.72 ± 6.09 | 30.04 ± 7.95 | −1.091 ± 0.987 |
+| 4 | Linear Regression | 24.72 ± 6.09 | 30.04 ± 7.95 | −1.091 ± 0.987 |
 
-Library defaults throughout — **no hyperparameter search was performed**; only `random_state`/`n_jobs` are pinned. SVR is wrapped in `TransformedTargetRegressor(transformer=StandardScaler())` because its `C`/`epsilon` defaults are expressed in target units (EE spans 0–98.9, SD ≈ 23.5); the y-transformer is fit on training-fold `y` only. `DummyRegressor(strategy="mean")` is a **reference, not a candidate** (`is_reference_not_a_candidate=True`) and is excluded from ranking.
+These fixed-partition results suggested lower MAE for Random Forest. However, the negative mean R² values and large fold-to-fold variability indicated that this ranking required additional robustness testing before any conclusion about unseen-drug generalization could be made.
 
-Best model by mean MAE (Random Forest) refit on all 430 rows → [`src/models/best_model_random_forest.joblib`](src/models) with a `.meta.json` sidecar.
+### Model Configuration
 
-> ### ⚠️ The ranking above does not replicate — read this before citing it
-> Mean per-fold R² is **negative for every model**, and un-shuffled `GroupKFold` produces exactly one partition. Repeating the grouped CV over **5 shuffled partitions** and pooling **out-of-fold** predictions (a size-independent metric — unweighted per-fold means over-weight the small folds that `shuffle=True` creates) gives:
->
-> | Model | pooled OOF MAE | pooled OOF R² |
-> |---|---|---|
-> | **DummyRegressor (mean-predictor)** | **19.14 ± 0.28** | −0.032 |
-> | Random Forest | 20.71 ± 3.18 | −0.299 |
-> | SVR (RBF) | 20.92 ± 1.72 | −0.210 |
-> | XGBoost | 21.86 ± 4.22 | −0.438 |
-> | Linear Regression | 25.72 ± 1.42 | −0.785 |
->
-> **No model beats the mean-predictor on average.** Wins vs the mean-predictor across the 5 partitions: RF 2/5, XGBoost 1/5, SVR 0/5, Linear 0/5. The Random Forest "win" in the main table is specific to the single un-shuffled partition. The saved artefact is therefore *the best of four candidates on one specified split*, **not a validated unseen-drug EE predictor** — this caveat is recorded inside the joblib sidecar as `generalisation_caveat`.
->
-> **Interpretation.** With 63 drug groups, ~51 % of them singletons, and 13 descriptors, the models appear to learn drug- and study-specific idiosyncrasies rather than transferable structure–encapsulation relationships. This is the substantive finding of the project: published random-split R² values are **not** evidence of unseen-drug generalisation.
+All candidate models used library-default hyperparameters; **no hyperparameter optimization was performed**. Only parameters required for reproducibility or computational control, such as `random_state` and `n_jobs`, were specified.
 
-Supporting tables: `laga_regrouping.csv`, `ML_cv_fold_composition.csv` (all 5 folds n_train=344 / n_test=86, test-fold mean EE 58.1–76.8 — folds are *not* exchangeable), `ML_grouped_per_fold_metrics.csv`, `ML_grouped_performance_repeated.csv`, `ML_grouped_performance_pooled_oof_repeated.csv`, `ML_grouped_pooled_oof_per_seed.csv`.
+For SVR, the target was standardized within each training fold using `TransformedTargetRegressor(transformer=StandardScaler())`, because the default `C` and `epsilon` parameters operate on the scale of the target variable. The target transformer was fitted only on the training-fold `EE` values.
 
-## Phase 5 deliverables (explainability & error analysis)
-Notebook: [`notebooks/05_explainability_and_errors.ipynb`](notebooks/05_explainability_and_errors.ipynb). Loads the saved Random Forest pipeline and `PLGA_clean_unscaled.csv`; the feature order is asserted identical to both the `.meta.json` sidecar and the fitted pipeline's `feature_names_in_` before anything is computed.
+`DummyRegressor(strategy="mean")` was included solely as a **reference predictor** and was not treated as a candidate model or included in model ranking.
 
-**SHAP (`shap.TreeExplainer`, 430 × 20, base value 64.735 EE %).** Additivity verified: `base_value + Σ SHAP` reproduces `pipeline.predict(X)` to 2.2e-13. Values are computed on the *scaled* matrix and coloured by *unscaled* feature values — `StandardScaler` is strictly monotone per feature, so ordering and attribution are unchanged.
+The Random Forest achieved the lowest mean MAE in the initial fixed grouped partition and was subsequently refitted on all 430 formulations for model inspection. The fitted artifact is stored in [`src/models/`](src/models) together with a metadata sidecar documenting its validation limitations.
 
-| # | Feature | mean \|SHAP\| (EE points) | share of attribution |
-|---|---|---|---|
-| 1 | `surfactant_concentration` | 6.67 | 26.0 % |
-| 2 | `mol_logP` | 4.14 | 16.1 % |
-| 3 | `polymer_MW` | 2.51 | 9.7 % |
-| 4 | `drug/polymer` | 2.38 | 9.3 % |
-| 5 | `mol_melting_point` | 1.68 | 6.5 % |
+### Robustness Across Grouped Partitions
 
-> ⚠️ **These are not biological ground truth.** Phase 4 established that the model does **not** generalise to unseen drugs, so this ranking describes what the Random Forest memorised to minimise *training* error. It is in-sample model introspection. 62 of 65 drugs appear in a single publication, so drug identity, study protocol, and descriptor values are confounded — an "important" descriptor may be standing in for "which paper this row came from." Every row of `SHAP_feature_importance.csv` carries `in_sample_only__not_ground_truth = True`.
+The apparent Random Forest advantage in the initial `GroupKFold` partition was **not stable across repeated grouped partitions**. Mean per-fold R² was negative for every candidate model in the initial analysis, indicating substantial variation in performance across held-out drug groups.
 
-**Why Phase 4 came out negative — the mechanism is shrinkage toward the mean.** Pooled out-of-fold predictions (5 shuffled grouped partitions, 60 fits, every fold asserting no `drug_group` *and* no `small_molecule_name` overlap) reproduce Phase 4 exactly: deterministic partition MAE **16.695** / R² **+0.170**; repeated-partition mean MAE **20.710**.
+To assess the stability of the ranking, grouped cross-validation was repeated across **five shuffled drug-group partitions**. Out-of-fold predictions were pooled across all held-out formulations within each partition before calculating performance metrics. This avoids giving small test folds the same weight as larger folds when summarizing performance.
 
-| Calibration of the OOF predictions | Model | Ideal |
-|---|---|---|
-| Regression slope of predicted on measured | **0.156** | 1.0 |
-| SD of predictions | 13.94 | 23.51 (measured) |
-| Range of predictions | 8.7 – 83.5 | 0.0 – 98.9 (measured) |
+| Model | Pooled OOF MAE | Pooled OOF R² |
+|---|---:|---:|
+| **DummyRegressor (mean-prediction reference)** | **19.14 ± 0.28** | −0.032 |
+| Random Forest | 20.71 ± 3.18 | −0.299 |
+| SVR (RBF) | 20.92 ± 1.72 | −0.210 |
+| XGBoost | 21.86 ± 4.22 | −0.438 |
+| Linear Regression | 25.72 ± 1.42 | −0.785 |
 
-The failure is **asymmetric**, not a symmetric loss of precision — quartiles of drug-group mean EE % (defined by `pd.qcut`, not chosen after inspecting errors):
+Across the repeated grouped partitions, **no candidate model consistently outperformed the mean-prediction reference for unseen drugs**. The lower MAE observed for Random Forest in the initial fixed partition was therefore partition-dependent rather than evidence of stable unseen-drug generalization.
+### Overall Phase 4 Finding
 
-| Quartile | drug-mean EE % | n groups | median MAE | mean signed error | Δ vs mean-predictor | worse than mean-predictor |
-|---|---|---|---|---|---|---|
-| Q1 lowest | 0.3 – 33.0 | 16 | 16.07 | **+20.95** (over) | **−28.71** | 2/16 |
-| Q2 | 33.5 – 65.1 | 16 | 15.91 | +11.05 | +0.15 | 8/16 |
-| Q3 | 65.3 – 79.9 | 15 | 17.59 | −11.42 | +6.43 | 11/15 |
-| Q4 highest | 80.5 – 98.8 | 16 | **27.10** | **−32.06** (under) | **+9.44** | 11/16 |
+**No candidate model consistently outperformed the mean-prediction reference across repeated grouped partitions.** Random Forest outperformed the reference in 2 of 5 partitions, XGBoost in 1 of 5, while SVR and Linear Regression did not outperform it in any partition.
 
-So the model genuinely **helps** on the lowest-EE quartile (a flat guess of 64.8 % is hopeless for a 10 %-EE drug) and **hurts** on the top two. The two effects nearly cancel, leaving it **+1.57 EE points worse** than a mean guess overall — that cancellation *is* Phase 4's headline. **32 of 63 drug groups are predicted worse than a mean guess.**
+The apparent Random Forest advantage observed in the initial fixed `GroupKFold` partition was therefore not stable across alternative drug-group partitions. The saved Random Forest artifact represents the best-performing candidate under that specified partition and is retained for model inspection and explainability analysis. It should **not be interpreted as a validated predictor of EE for unseen drugs**. This limitation is documented in the model metadata under `generalisation_caveat`.
 
-Distance from the dataset mean does **not** significantly explain per-drug error (Pearson r = +0.201, p = 0.114; Spearman ρ = +0.225, p = 0.076; n = 63) — reported here because it was tested, and it is the asymmetry above, not distance, that carries the signal.
+### Interpretation
 
-**Worst 5 drugs** (repeated-CV MAE, EE points) — all five worse than a mean guess, three of them singletons:
+The limited generalization observed across the 63 drug groups is consistent with sparse and highly imbalanced drug representation, limited descriptor coverage, and substantial study-level heterogeneity. Approximately 51% of drug groups contain only a single formulation, which restricts the amount of transferable information available for learning relationships that extend to unseen compounds.
 
-| Drug | n | measured EE % | predicted | MAE | Δ vs mean-pred. | direction |
-|---|---|---|---|---|---|---|
-| ketoprofen | 2 | 10.6 | 83.3 | **72.78** | +17.99 | over |
-| paeonol | 1 | 86.3 | 31.7 | 54.61 | +32.17 | under |
-| tretinoin | 1 | 98.8 | 44.4 | 54.39 | +21.06 | under |
-| levofloxacin | 1 | 15.0 | 66.9 | 51.86 | +2.42 | over |
-| dexibuprofen | 3 | 88.7 | 38.0 | 50.64 | +25.39 | under |
+These findings indicate that performance obtained from formulation-level splits does not, by itself, demonstrate generalization to drugs excluded from model training. Drug-grouped evaluation is therefore necessary when the intended application involves prediction for previously unseen small-molecule drugs.
 
-**Best 5** (rapamycin 3.77, isoniazid 5.28, rhodamine-123 5.92, kartogenin 6.44, propyl-4-hydroxybenzoate 6.46) are **all singletons** — one measurement each. They are recorded as *not yet contradicted*, not as solved.
+### Supporting Tables
 
-Sample size does not buy safety: flurbiprofen has 36 formulations yet MAE 41.42 under repeated CV vs 20.65 on the single deterministic partition. Withholding a whole large drug block removes much of the training signal, so the `MAE_repeated` − `MAE_single_partition` gap is itself a diagnostic column.
+- `laga_regrouping.csv`
+- `ML_cv_fold_composition.csv`
+- `ML_grouped_per_fold_metrics.csv`
+- `ML_grouped_performance_repeated.csv`
+- `ML_grouped_performance_pooled_oof_repeated.csv`
+- `ML_grouped_pooled_oof_per_seed.csv`
 
-Figures (300 DPI): `Fig4_SHAP_summary.png` (beeswarm + mean-|SHAP| bars), `Fig5_Actual_vs_Predicted_OOF.png` (deterministic vs seed-averaged OOF, `y = x` diagonal, singletons marked), `Fig6_Worst_Predicted_Drugs.png` (absolute-error distributions for the worst 5).
-Tables: `Error_analysis_by_drug.csv` (63 rows, 23 columns), `Error_analysis_by_EE_quartile.csv`, `SHAP_feature_importance.csv`, `OOF_predictions_random_forest.csv` (430 rows, per-seed predictions retained).
+`ML_cv_fold_composition.csv` documents the composition of the five grouped folds, including training/test sample sizes and variation in mean EE across held-out folds.
 
-> **Note on Fig 5(b).** Its MAE 20.02 / R² −0.129 are the metrics of the *seed-averaged* prediction; Phase 4's pooled 20.71 is the *mean of the five per-partition MAEs*. Averaging across partitions cancels partition-to-partition variance, so the averaged prediction scores better. Both are correct measures of different quantities.
+## Phase 5 Deliverables — Explainability and Error Analysis
 
-## Reproducing the audit
-Python 3.12, dependencies in [`requirements.txt`](requirements.txt).
+**Notebook:** [`notebooks/05_explainability_and_errors.ipynb`](notebooks/05_explainability_and_errors.ipynb)
+
+The analysis loads the saved Random Forest pipeline together with `PLGA_clean_unscaled.csv`. Feature order is verified against both the fitted pipeline and its `.meta.json` sidecar before model-attribution analysis is performed.
+
+### SHAP Analysis
+
+SHAP values were calculated using `shap.TreeExplainer` for all **430 formulations × 20 model features**. The model base value was **64.735 EE%**, and SHAP additivity was numerically verified against the pipeline predictions.
+
+| # | Feature | Mean \|SHAP\| (EE points) | Share of attribution |
+|---|---|---:|---:|
+| 1 | `surfactant_concentration` | 6.67 | 26.0% |
+| 2 | `mol_logP` | 4.14 | 16.1% |
+| 3 | `polymer_MW` | 2.51 | 9.7% |
+| 4 | `drug/polymer` | 2.38 | 9.3% |
+| 5 | `mol_melting_point` | 1.68 | 6.5% |
+
+> ⚠️ **Interpretation caution.** These SHAP values describe model attribution within the fitted Random Forest and should not be interpreted as biological causation or validated determinants of encapsulation efficiency. Phase 4 showed that the model did not generalize reliably to unseen drugs. In addition, 62 of 65 drugs occur in only one source publication, so drug identity, study conditions, and descriptor values are strongly confounded. Feature-attribution results should therefore be interpreted as model-specific patterns rather than biological ground truth.
+
+### Prediction-Error Pattern
+
+Repeated grouped out-of-fold predictions showed substantial compression toward the dataset mean. The analysis used five shuffled drug-group partitions, with no overlap in either `drug_group` or `small_molecule_name` between training and test sets.
+
+The deterministic grouped partition produced an MAE of **16.695** and R² of **+0.170**, whereas the mean MAE across repeated grouped partitions was **20.710**.
+
+| Prediction-compression measure | Model | Reference |
+|---|---:|---:|
+| Regression slope of predicted versus measured EE | **0.156** | 1.0 |
+| SD of predictions | 13.94 | 23.51 measured |
+| Prediction range | 8.7–83.5 | 0.0–98.9 measured |
+
+The slope substantially below 1.0, together with the narrower prediction variance and range, indicates that the model tended to pull extreme EE values toward the center of the observed distribution.
+
+### Error Distribution Across EE Quartiles
+
+Drug groups were divided into quartiles according to their mean measured EE using `pd.qcut`.
+
+**Δ vs mean predictor = model MAE − mean-predictor MAE.** Negative values indicate lower error than the reference, while positive values indicate higher error.
+
+| Quartile | Drug-group mean EE% | n groups | Median MAE | Mean signed error | Δ vs mean predictor | Groups worse than reference |
+|---|---:|---:|---:|---:|---:|---:|
+| Q1 — lowest | 0.3–33.0 | 16 | 16.07 | **+20.95** | **−28.71** | 2/16 |
+| Q2 | 33.5–65.1 | 16 | 15.91 | +11.05 | +0.15 | 8/16 |
+| Q3 | 65.3–79.9 | 15 | 17.59 | −11.42 | +6.43 | 11/15 |
+| Q4 — highest | 80.5–98.8 | 16 | **27.10** | **−32.06** | **+9.44** | 11/16 |
+
+The error pattern was asymmetric. Predictions tended to **overestimate low-EE drugs** and **underestimate high-EE drugs**. Relative to the mean-prediction reference, Random Forest showed lower error in the lowest-EE quartile but poorer performance in the two highest quartiles. Overall, **32 of 63 drug groups** were predicted less accurately than the mean-prediction reference.
+
+Distance from the dataset mean did not show a statistically significant association with per-drug prediction error (Pearson r = +0.201, p = 0.114; Spearman ρ = +0.225, p = 0.076; n = 63). These results suggest that the main limitation was not simply distance from the overall mean, but an asymmetric compression of predictions across the EE range.
+
+### Drug-Level Error Analysis
+
+The five drug groups with the highest repeated-CV MAE are shown below. All performed worse than the mean-prediction reference, and three were represented by a single formulation.
+
+| Drug | n | Measured EE% | Predicted EE% | MAE | Δ vs mean predictor | Error direction |
+|---|---:|---:|---:|---:|---:|---|
+| ketoprofen | 2 | 10.6 | 83.3 | **72.78** | +17.99 | overprediction |
+| paeonol | 1 | 86.3 | 31.7 | 54.61 | +32.17 | underprediction |
+| tretinoin | 1 | 98.8 | 44.4 | 54.39 | +21.06 | underprediction |
+| levofloxacin | 1 | 15.0 | 66.9 | 51.86 | +2.42 | overprediction |
+| dexibuprofen | 3 | 88.7 | 38.0 | 50.64 | +25.39 | underprediction |
+
+The five lowest-error drug groups were rapamycin (MAE 3.77), isoniazid (5.28), rhodamine-123 (5.92), kartogenin (6.44), and propyl-4-hydroxybenzoate (6.46). All five were singletons, so their apparently low errors are based on only one formulation each and should not be interpreted as evidence of consistently reliable prediction for those drugs.
+
+Formulation count alone did not ensure stable prediction. For example, flurbiprofen was represented by 36 formulations but had a repeated-CV MAE of **41.42**, compared with **20.65** under the initial fixed grouped partition. This difference illustrates the sensitivity of drug-level performance to the particular grouped partition and further supports the use of repeated grouped evaluation rather than reliance on a single split.
+
+### Phase 5 Figures and Tables
+
+Figures are available at **300 DPI** in `results/figures/`:
+
+- `Fig4_SHAP_summary.png` — SHAP beeswarm and mean absolute SHAP attribution.
+- `Fig5_Actual_vs_Predicted_OOF.png` — measured versus out-of-fold predicted EE for the fixed and seed-averaged grouped analyses, with the `y = x` reference line and singleton drug groups identified.
+- `Fig6_Worst_Predicted_Drugs.png` — absolute-error distributions for the five highest-error drug groups.
+
+Supporting tables include:
+
+- `Error_analysis_by_drug.csv` — 63 drug groups with drug-level error metrics.
+- `Error_analysis_by_EE_quartile.csv`
+- `SHAP_feature_importance.csv`
+- `OOF_predictions_random_forest.csv` — 430 formulations with per-seed out-of-fold predictions.
+
+> **Note on Fig. 5(b).** The seed-averaged out-of-fold prediction has an MAE of **20.02** and R² of **−0.129**. The Phase 4 value of **20.71** represents the mean of the five partition-specific pooled MAEs. Averaging predictions across partitions reduces partition-specific variation, so these values summarize different quantities and are not expected to be identical.
+
+## Reproducing the Analysis
+
+The analysis was developed using **Python 3.12**. Required dependencies are listed in [`requirements.txt`](requirements.txt).
+
+The following commands reproduce the workflow on Windows:
 
 ```bash
 python -m venv .venv
@@ -232,8 +308,17 @@ python -m venv .venv
 .venv/Scripts/python.exe -m jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_audit.ipynb notebooks/02_preprocessing.ipynb notebooks/03_exploratory_analysis.ipynb notebooks/04_model_training.ipynb notebooks/05_explainability_and_errors.ipynb
 ```
 
-## Integrity commitments
-No fabricated values, no synthetic formulations, no minority-class oversampling, no silent data edits. Raw data is verified by SHA256 and never modified. Correlations are reported as associations, not causation. Generalisation claims are scoped to the dataset's constrained chemical space.
+## Research Integrity
+No values or formulations were fabricated or synthetically generated. No oversampling was applied, and data modifications are documented throughout the workflow. Original source files were retained unchanged and verified using SHA256 checksums. Correlations are interpreted as associations rather than evidence of causation, and conclusions about generalization are restricted to the chemical and formulation space represented in the available dataset.
 
 ## License
-Code: for academic evaluation. Dataset: CC BY 4.0 (attribute Goren et al. 2025 as above).
+The source dataset is distributed under CC BY 4.0 and should be attributed to Goren et al. (2025) using the citation provided above.
+No separate software license is currently granted for the project code; all rights to the code are reserved unless otherwise stated.
+
+I prefer **“Research Integrity”** over “Integrity commitments” because it sounds more natural in an academic repository.
+
+The overall ending order is also correct:
+
+**Reproducibility → Research Integrity → License**
+
+If you later decide to make the code reusable, we can replace the last paragraph with a proper MIT or BSD license statement.
