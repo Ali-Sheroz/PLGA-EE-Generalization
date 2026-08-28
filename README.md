@@ -302,7 +302,7 @@ The analysis was developed using **Python 3.12**. Required dependencies are list
 
 The following commands reproduce the workflow on Windows:
 
-```bash
+```
 python -m venv .venv
 .venv/Scripts/python.exe -m pip install -r requirements.txt
 .venv/Scripts/python.exe -m jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_audit.ipynb notebooks/02_preprocessing.ipynb notebooks/03_exploratory_analysis.ipynb notebooks/04_model_training.ipynb notebooks/05_explainability_and_errors.ipynb
@@ -315,10 +315,3 @@ No values or formulations were fabricated or synthetically generated. No oversam
 The source dataset is distributed under CC BY 4.0 and should be attributed to Goren et al. (2025) using the citation provided above.
 No separate software license is currently granted for the project code; all rights to the code are reserved unless otherwise stated.
 
-I prefer **“Research Integrity”** over “Integrity commitments” because it sounds more natural in an academic repository.
-
-The overall ending order is also correct:
-
-**Reproducibility → Research Integrity → License**
-
-If you later decide to make the code reusable, we can replace the last paragraph with a proper MIT or BSD license statement.
