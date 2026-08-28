@@ -6,9 +6,9 @@
 
 This undergraduate biotechnology research project evaluates whether encapsulation efficiency in PLGA nanoparticle formulations can be predicted reliably for small-molecule drugs excluded from model training.
 
-> **Research question:** How accurately can machine learning predict encapsulation efficiency (EE%) in PLGA nanoparticle formulations for small-molecule drugs that were completely excluded from model training?
+> **Research question:** How accurately can machine-learning models predict encapsulation efficiency (EE%) in PLGA nanoparticle formulations for small-molecule drugs excluded from model training?
 
-The scientific focus is **unseen-drug generalization** rather than simply determining whether machine learning can predict encapsulation efficiency. The sole prediction target is **EE%**. Particle size, loading capacity, drug release, toxicity, efficacy, biodistribution, and clinical response are outside the scope of this study as prediction targets.
+The scientific focus is **unseen-drug generalization **rather than simply determining whether machine-learning models can predict encapsulation efficiency. The sole prediction target is **EE%**. Particle size, loading capacity, drug release, toxicity, efficacy, biodistribution, and clinical response are outside the scope of this study as prediction targets.
 
 ## Technical Stack
 
